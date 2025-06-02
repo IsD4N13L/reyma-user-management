@@ -10,13 +10,13 @@ namespace UserManagement.Domain
         public Guid Id { get; private set; } = Guid.NewGuid();
 
         public bool IsDeleted { get; private set; }
-        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset? CreatedOn { get; private set; }
 
-        public string CreatedBy { get; private set; }
+        public string? CreatedBy { get; private set; }
 
         public DateTimeOffset? LastModifiedOn { get; private set; }
 
-        public string LastModifiedBy { get; private set; }
+        public string? LastModifiedBy { get; private set; }
 
 
         [NotMapped]

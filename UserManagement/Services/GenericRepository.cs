@@ -34,7 +34,7 @@ namespace UserManagement.Services
             return _dbContext.Set<TEntity>();
         }
 
-        public virtual async Task<TEntity> GetByIdOrDefault(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> GetByIdOrDefault(Guid id, bool withTracking = true, CancellationToken cancellationToken = default)
         {
             return withTracking
                 ? await _dbContext.Set<TEntity>()

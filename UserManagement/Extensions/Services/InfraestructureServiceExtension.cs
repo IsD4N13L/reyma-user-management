@@ -14,7 +14,8 @@ namespace UserManagement.Extensions.Services
         {
             var connectionstring = string.Empty;
 
-            connectionstring = Environment.GetEnvironmentVariable("DATABASE");
+            //connectionstring = Environment.GetEnvironmentVariable("DATABASE");
+            connectionstring = configuration.GetConnectionString("SQLSERVER_DATABASE");
             if (string.IsNullOrEmpty(connectionstring))
             {
                 connectionstring = configuration.GetConnectionString(ConnectionStringOptions.UserManagementKey);
