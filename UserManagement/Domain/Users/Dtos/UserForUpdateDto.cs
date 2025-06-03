@@ -7,5 +7,6 @@
         public string PasswordHash { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public bool Active { get; set; }
+        public string? PhotoBase64 { get; set; }
     }
 }

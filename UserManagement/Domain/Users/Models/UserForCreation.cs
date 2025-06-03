@@ -7,5 +7,7 @@
         public string PasswordHash { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public bool Active { get; set; }
+        public string? PhotoUrl { get; set; }
+        public string? PhotoBlobName { get; set; }
     }
 }

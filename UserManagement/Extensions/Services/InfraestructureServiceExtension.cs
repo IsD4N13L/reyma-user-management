@@ -1,4 +1,6 @@
-﻿using Hangfire;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
+using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Configurations;
@@ -23,6 +25,14 @@ namespace UserManagement.Extensions.Services
 
             services.AddDbContext<UserManagementDbContext>(options => options.UseSqlServer(connectionstring));
             services.SetupHangfire(env);
+
+            services.AddSingleton<BlobServiceClient>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var blobServiceUrl = Environment.GetEnvironmentVariable("AzureStorage__BlobServiceUrl")!;
+                var credential = new DefaultAzureCredential();
+                return new BlobServiceClient(new Uri(blobServiceUrl), credential);
+            });
         }
     }
 
