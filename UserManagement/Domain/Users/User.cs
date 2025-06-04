@@ -13,6 +13,10 @@ namespace UserManagement.Domain.Users
         public string? PhotoUrl { get; set; }
         public string? PhotoBlobName { get; set; }
 
+        public string? EncryptedPhoneNumber { get; set; }
+        public string? EncryptedAddress { get; set; }
+        public string? EncryptedPersonalData { get; set; }
+
         public static User Create(UserForCreation userForCreation)
         {
             var newUser = new User();
@@ -24,6 +28,9 @@ namespace UserManagement.Domain.Users
             newUser.Active = userForCreation.Active;
             newUser.PhotoUrl = userForCreation.PhotoUrl;
             newUser.PhotoBlobName = userForCreation.PhotoBlobName;
+            newUser.EncryptedPhoneNumber = userForCreation.EncryptedPhoneNumber;
+            newUser.EncryptedAddress = userForCreation.EncryptedAddress;
+            newUser.EncryptedPersonalData = userForCreation.EncryptedPersonalData;
 
             newUser.QueueDomainEvent(new UserCreated() { User = newUser });
             return newUser;
@@ -37,6 +44,10 @@ namespace UserManagement.Domain.Users
             Active = userForUpdate.Active;
             PhotoUrl = userForUpdate.PhotoUrl ?? PhotoUrl;
             PhotoBlobName = userForUpdate.PhotoBlobName ?? PhotoBlobName;
+            EncryptedPhoneNumber = userForUpdate.EncryptedPhoneNumber ?? EncryptedPhoneNumber;
+            EncryptedAddress = userForUpdate.EncryptedAddress ?? EncryptedAddress;
+            EncryptedPersonalData = userForUpdate.EncryptedPersonalData ?? EncryptedPersonalData;
+
 
             QueueDomainEvent(new UserUpdated() { Id = Id });
             return this;

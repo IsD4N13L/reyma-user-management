@@ -10,13 +10,32 @@ namespace UserManagement.Domain.Users.Features
     public static class AddUser
     {
         public sealed record Command(UserForCreationDto UserToAdd) : IRequest<UserDto>;
-        public sealed class Handler(IUserRepository userRepository, IUnitOfWork unitOfWork, IUserPhotoService userPhotoService)
+        public sealed class Handler(IUserRepository userRepository,
+            IUnitOfWork unitOfWork, IUserPhotoService userPhotoService,
+            IUserSecurityService userSecurityService)
         : IRequestHandler<Command, UserDto>
         {
             public async Task<UserDto> Handle(Command request, CancellationToken cancellationToken)
             {
                 var userToAdd = request.UserToAdd.ToUserForCreation();
+
+                var hashedPassword = await userSecurityService.HashPasswordAsync(userToAdd.PasswordHash);
+                userToAdd.PasswordHash = hashedPassword;
+
                 var user = User.Create(userToAdd);
+
+                // Cifrar datos sensibles si están presentes
+                if (!string.IsNullOrWhiteSpace(request.UserToAdd.PhoneNumber))
+                {
+                    user.EncryptedPhoneNumber = await userSecurityService.EncryptPersonalDataAsync(
+                        request.UserToAdd.PhoneNumber, cancellationToken);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.UserToAdd.Address))
+                {
+                    user.EncryptedAddress = await userSecurityService.EncryptPersonalDataAsync(
+                        request.UserToAdd.Address, cancellationToken);
+                }
 
                 if (!string.IsNullOrWhiteSpace(request.UserToAdd.PhotoBase64))
                 {

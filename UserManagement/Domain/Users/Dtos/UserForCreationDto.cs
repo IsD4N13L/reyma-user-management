@@ -8,5 +8,8 @@
         public DateTime? LastLoginAt { get; set; }
         public bool Active { get; set; }
         public string? PhotoBase64 { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Address { get; set; }
+        public string? PersonalData { get; set; }
     }
 }

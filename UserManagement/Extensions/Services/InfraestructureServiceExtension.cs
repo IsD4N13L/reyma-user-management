@@ -1,10 +1,14 @@
 ﻿using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Configurations;
 using UserManagement.Databases;
+using UserManagement.Domain.Users;
 using UserManagement.Resources;
 using UserManagement.Resources.HangfireUtilities;
 
@@ -33,6 +37,21 @@ namespace UserManagement.Extensions.Services
                 var credential = new DefaultAzureCredential();
                 return new BlobServiceClient(new Uri(blobServiceUrl), credential);
             });
+
+
+            services.AddSingleton<SecretClient>(provider =>
+            {
+                var keyVaultUri = Environment.GetEnvironmentVariable("AzureKeyVault__VaultUri");
+                return new SecretClient(new Uri(keyVaultUri), new DefaultAzureCredential());
+            });
+
+            services.AddSingleton<KeyClient>(provider =>
+            {
+                var keyVaultUri = Environment.GetEnvironmentVariable("AzureKeyVault__VaultUri");
+                return new KeyClient(new Uri(keyVaultUri), new DefaultAzureCredential());
+            });
+
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         }
     }
 

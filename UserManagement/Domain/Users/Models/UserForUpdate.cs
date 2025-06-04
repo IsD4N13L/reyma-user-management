@@ -9,5 +9,8 @@
         public bool Active { get; set; }
         public string? PhotoUrl { get; set; }
         public string? PhotoBlobName { get; set; }
+        public string? EncryptedPhoneNumber { get; set; }
+        public string? EncryptedAddress { get; set; }
+        public string? EncryptedPersonalData { get; set; }
     }
 }
