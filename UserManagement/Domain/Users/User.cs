@@ -9,6 +9,7 @@ namespace UserManagement.Domain.Users
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public DateTime? LastLoginAt { get; set; }
+        public bool Active { get; set; }
 
         public static User Create(UserForCreation userForCreation)
         {
@@ -18,6 +19,7 @@ namespace UserManagement.Domain.Users
             newUser.Email = userForCreation.Email;
             newUser.PasswordHash = userForCreation.PasswordHash;
             newUser.LastLoginAt = userForCreation.LastLoginAt;
+            newUser.Active = userForCreation.Active;
 
             newUser.QueueDomainEvent(new UserCreated() { User = newUser });
             return newUser;
@@ -28,6 +30,7 @@ namespace UserManagement.Domain.Users
             Username = userForUpdate.Username;
             Email = userForUpdate.Email;
             LastLoginAt = userForUpdate.LastLoginAt;
+            Active = userForUpdate.Active;
 
             QueueDomainEvent(new UserUpdated() { Id = Id });
             return this;

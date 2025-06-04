@@ -12,7 +12,13 @@ namespace UserManagement.Extensions.Services
     {
         public static void AddInfraestructure(this IServiceCollection services, IWebHostEnvironment env, IConfiguration configuration)
         {
-            var connectionstring = configuration.GetConnectionString(ConnectionStringOptions.UserManagementKey);
+            var connectionstring = configuration.GetConnectionString("SQLSERVER_DATABASE");
+
+            if (string.IsNullOrEmpty(connectionstring))
+            {
+                connectionstring = configuration.GetConnectionString(ConnectionStringOptions.UserManagementKey);
+            }
+
 
             services.AddDbContext<UserManagementDbContext>(options => options.UseSqlServer(connectionstring));
             services.SetupHangfire(env);
