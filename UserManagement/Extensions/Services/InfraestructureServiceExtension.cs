@@ -11,6 +11,7 @@ using UserManagement.Databases;
 using UserManagement.Domain.Users;
 using UserManagement.Resources;
 using UserManagement.Resources.HangfireUtilities;
+using UserManagement.Services;
 
 namespace UserManagement.Extensions.Services
 {
@@ -52,6 +53,7 @@ namespace UserManagement.Extensions.Services
             });
 
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
         }
     }
 
