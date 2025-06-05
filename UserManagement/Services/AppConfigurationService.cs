@@ -13,6 +13,8 @@ namespace UserManagement.Services
         Task<int> GetIntAsync(string key, int defaultValue = 0);
         Task UpdateConfigurationAsync(string key, object value);
         Task<Dictionary<string, object>> GetAllConfigurationsAsync(string prefix = "");
+        Task<List<string>> GetAllFeatureNamesAsync();
+        Task<Dictionary<string, object>> GetFeatureParametersAsync(string featureName);
     }
     public class AppConfigurationService(IConfiguration configuration) : IAppConfigurationService
     {
@@ -93,6 +95,69 @@ namespace UserManagement.Services
             }
 
             return Task.FromResult(configurations);
+        }
+
+        public Task<List<string>> GetAllFeatureNamesAsync()
+        {
+            var features = new List<string>();
+
+            try
+            {
+                var featureSection = configuration.GetSection("FeatureManagement");
+
+                foreach (var child in featureSection.GetChildren())
+                {
+                    if (!IsSystemConfiguration(child.Key))
+                    {
+                        features.Add(child.Key);
+                    }
+                }
+
+                Log.Information("Features encontrados en configuración: {Features}", string.Join(", ", features));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error obteniendo nombres de features");
+            }
+
+            return Task.FromResult(features);
+        }
+
+        public Task<Dictionary<string, object>> GetFeatureParametersAsync(string featureName)
+        {
+            var parameters = new Dictionary<string, object>();
+
+            try
+            {
+                var featureSection = configuration.GetSection($"FeatureManagement:{featureName}");
+
+                foreach (var child in featureSection.GetChildren())
+                {
+                    parameters[child.Key] = child.Value ?? "";
+                }
+
+                Log.Debug("Parámetros obtenidos para feature {FeatureName}: {ParameterCount}",
+                    featureName, parameters.Count);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error obteniendo parámetros del feature: {FeatureName}", featureName);
+            }
+
+            return Task.FromResult(parameters);
+        }
+
+        private bool IsSystemConfiguration(string key)
+        {
+            var systemKeys = new[]
+            {
+            "RefreshSentinel",
+            "CacheExpiration",
+            "Label",
+            "Environment"
+        };
+
+            return systemKeys.Contains(key, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

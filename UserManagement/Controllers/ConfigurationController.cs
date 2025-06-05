@@ -16,8 +16,20 @@ namespace UserManagement.Controllers
         {
             try
             {
+                // Obtener features dinámicamente desde App Configuration
                 var features = await featureToggleService.GetAllFeaturesAsync();
-                return Ok(new { features, timestamp = DateTime.UtcNow });
+                var featureNames = await appConfigurationService.GetAllFeatureNamesAsync();
+
+                var result = new
+                {
+                    features,
+                    discoveredFeatures = featureNames,
+                    totalCount = features.Count,
+                    enabledCount = features.Count(f => f.Value),
+                    timestamp = DateTime.UtcNow
+                };
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -26,26 +38,27 @@ namespace UserManagement.Controllers
             }
         }
 
-        [HttpGet("settings")]
-        public async Task<ActionResult> GetSettings()
+        [HttpGet("features/{featureName}")]
+        public async Task<ActionResult> GetFeatureDetails(string featureName)
         {
             try
             {
-                var settings = new
+                var isEnabled = await featureToggleService.IsEnabledAsync(featureName);
+                var parameters = await appConfigurationService.GetFeatureParametersAsync(featureName);
+
+                var result = new
                 {
-                    MaxPhotoSizeMB = await appConfigurationService.GetIntAsync("UserManagement:MaxPhotoSizeMB", 5),
-                    AllowedPhotoTypes = await appConfigurationService.GetStringAsync("UserManagement:AllowedPhotoTypes", "jpg,png,gif"),
-                    TokenExpirationHours = await appConfigurationService.GetIntAsync("UserManagement:TokenExpirationHours", 24),
-                    MaxLoginAttempts = await appConfigurationService.GetIntAsync("UserManagement:MaxLoginAttempts", 5),
-                    EmailNotificationsEnabled = await featureToggleService.IsEnabledAsync("EmailNotifications"),
-                    TwoFactorAuthEnabled = await featureToggleService.IsEnabledAsync("TwoFactorAuth")
+                    featureName,
+                    isEnabled,
+                    parameters,
+                    timestamp = DateTime.UtcNow
                 };
 
-                return Ok(new { settings, timestamp = DateTime.UtcNow });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error obteniendo configuraciones");
+                Log.Error(ex, "Error obteniendo detalles del feature: {FeatureName}", featureName);
                 return StatusCode(500, new { message = "Error interno del servidor" });
             }
         }
@@ -56,15 +69,19 @@ namespace UserManagement.Controllers
         {
             try
             {
+                var allFeatures = await featureToggleService.GetAllFeaturesAsync();
+                var discoveredFeatures = await appConfigurationService.GetAllFeatureNamesAsync();
+
                 var health = new
                 {
                     Status = "Healthy",
                     Timestamp = DateTime.UtcNow,
-                    ConfigurationSources = new
+                    Configuration = new
                     {
-                        AppConfiguration = await appConfigurationService.GetStringAsync("UserManagement:RefreshSentinel", "") != "",
-                        FeatureFlags = await featureToggleService.IsEnabledAsync("UserPhotoUpload") ||
-                                       await featureToggleService.IsEnabledAsync("UserEncryption")
+                        TotalFeatures = allFeatures.Count,
+                        EnabledFeatures = allFeatures.Count(f => f.Value),
+                        DiscoveredFromConfig = discoveredFeatures.Count,
+                        FeaturesFromAppConfig = discoveredFeatures.Count > 0
                     }
                 };
 

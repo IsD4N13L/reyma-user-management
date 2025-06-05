@@ -50,6 +50,10 @@ namespace UserManagement.Extensions.Services
             var appConfigConnectionString = Environment.GetEnvironmentVariable("AzureAppConfiguration__ConnectionString") ?? builder.Configuration["AzureAppConfiguration:ConnectionString"];
             var appConfigEndpoint = Environment.GetEnvironmentVariable("AzureAppConfiguration__Endpoint") ?? builder.Configuration["AzureAppConfiguration:Endpoint"];
 
+
+            Log.Information("Configurando Azure App Configuration con ConnectionString: {ConnectionString} y Endpoint: {Endpoint}",
+                appConfigConnectionString, appConfigEndpoint);
+
             if (!string.IsNullOrEmpty(appConfigConnectionString) || !string.IsNullOrEmpty(appConfigEndpoint))
             {
                 try
